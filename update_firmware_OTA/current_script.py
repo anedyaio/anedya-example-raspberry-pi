@@ -2,10 +2,11 @@ import time
 import json
 import requests
 from pathlib import Path
+
 from updater import check_for_updates
 
 
-#----------- Essential credentials-----------------------------
+#-----------credentials-----------------------------
 CONNECTION_KEY = ""
 
 #----------settings---------------------------------
@@ -39,7 +40,7 @@ def main():
                 if deployed_id!="":
                     update_status(param_deployment_id=deployed_id, param_status="success", param_log="success")
                     print("====================================================================================")
-                    submit_log(f"version: {deployed_version} - OTA deployed!!")
+                    submit_log(f"version: {deployed_version} - deployed!!")
                     print("====================================================================================")
                     runned_once = True
             except KeyError:
@@ -50,7 +51,7 @@ def main():
 
 
         print()
-        print("[Version 0.1] Runnning...")
+        print("[Version 0.0.1] Runnning...")
         print()
         time.sleep(2)
 

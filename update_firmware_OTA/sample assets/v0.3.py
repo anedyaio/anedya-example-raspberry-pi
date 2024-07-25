@@ -40,7 +40,7 @@ def main():
                 if deployed_id!="":
                     update_status(param_deployment_id=deployed_id, param_status="success", param_log="success")
                     print("====================================================================================")
-                    submit_log(f"version: {deployed_version} - OTA deployed!!")
+                    submit_log(f"version: {deployed_version} - deployed!!")
                     print("====================================================================================")
                     runned_once = True
             except KeyError:

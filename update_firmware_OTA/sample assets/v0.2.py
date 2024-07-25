@@ -1,3 +1,6 @@
+"""
+This is a sample script (asset) for testing.
+"""
 import time
 import json
 import requests

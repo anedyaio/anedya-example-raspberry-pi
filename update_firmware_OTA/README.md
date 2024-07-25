@@ -14,6 +14,14 @@ This Python script allows you to update the firmware via OTA. It fetches the fir
     certutil -hashfile [file location] SHA256
     ```
 
+# For testing
+ 
+There are included sample assets folder. You can use that sample script to test the OTA through anedya.
+
+checksum 
+    - ** v0.2.py**: a0aab80c2328a784bbd7c02f3267d415237af45b1b99f7e5fb29f42e51705b88
+    - ** v0.3.py**: c31ec285d39b89e22f97ae8243af42a7e5d4c05456713249eba9d496a0e2ed65
+
  > [!TIP]
  > For more details, Visit anedya [documentation](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=pi)
 

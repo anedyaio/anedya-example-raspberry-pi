@@ -28,8 +28,9 @@ All set on the dashboard side.
 
 ### Hardware Side:
 1. Copy the example code.
-2. Fill in your credentials (e.g., connection key).
+2. Write down your code and credentials (e.g., connection key) in the `current_script.py` file.
 3. Install the necessary dependencies and it's ready to go.
+4. Run the `current_script.py`.
 
 ## For Testing
 

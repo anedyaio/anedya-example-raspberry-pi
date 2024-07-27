@@ -38,8 +38,7 @@ This Python script allows you to update the firmware via OTA. It fetches the fir
 All set on the dashboard side.
 
 ### Raspberry Pi Project Setup Guide
-
-    Follow these instructions to set up and run your project on a Raspberry Pi.
+Follow these instructions to set up and run your project on a Raspberry Pi.
 
 #### Steps:
 

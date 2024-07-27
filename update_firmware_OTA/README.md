@@ -20,12 +20,12 @@ This Python script allows you to update the firmware via OTA. It fetches the fir
     - **Asset Identifier**
     - **Asset Version**
     - **Checksum**: Use the following command to obtain the checksum.
-        For Windows:
+        - For Windows:
             Open the command prompt, navigate to the file directory, and run:
             ```
             certutil -hashfile [file ] SHA256
             ```
-        For Linux:
+        - For Linux:
             Open the terminal, navigate to the file directory, and run:
             ```
             sha256sum [file ]

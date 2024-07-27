@@ -60,7 +60,7 @@ Follow these instructions to set up and run your project on a Raspberry Pi.
         "connection_key": "Your_Connection_Key",
         "asset_version": "Your_Asset_Version"
         }
-3. Run `current-script.py`
+3. Run `current_script.py`
 
 > [!TIP]
 > For more details, visit Anedya [documentation](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=pi).

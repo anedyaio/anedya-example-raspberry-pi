@@ -60,8 +60,17 @@ Follow these instructions to set up and run your project on a Raspberry Pi.
         "connection_key": "Your_Connection_Key",
         "asset_version": "Your_Asset_Version"
         }
-3. Run `current_script.py`
-
+3. Write Your Code
+    Write or paste your code into the current_script.py file. This script will contain the main logic for your project.
+4. Install Necessary Dependencies
+    Ensure that all necessary dependencies are installed.
+5. Run Your Script
+    Once everything is set up, you can run your script by executing the following command in your terminal:
+    """
+    python current_script.py
+    """
+    This will start your project, and you should see the output or any relevant messages on your terminal.
+    
 > [!TIP]
 > For more details, visit Anedya [documentation](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=pi).
 

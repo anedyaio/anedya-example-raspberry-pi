@@ -28,17 +28,17 @@ All set on the dashboard side.
 
 ### Hardware Side:
 1. Copy the example code.
-2. Write down your code and credentials (e.g., connection key) in the `current_script.py` file.
-3. Install the necessary dependencies and it's ready to go.
-4. Run the `current_script.py`.
+2. Fill the`project name`, `connection key` and `asset version` in `configuration.json`
+3. Write down your code in the `current_script.py` file.
+4. Install the necessary dependencies and it's ready to go.
+5. Run the `current_script.py`.
 
 ## For Testing
 
 Sample assets are included in the folder. You can use the sample script to test the OTA through Anedya.
 
 Checksums:
-- **v0.2.py**: `a0aab80c2328a784bbd7c02f3267d415237af45b1b99f7e5fb29f42e51705b88`
-- **v0.3.py**: `c31ec285d39b89e22f97ae8243af42a7e5d4c05456713249eba9d496a0e2ed65`
+- **v0.2.py**: `0f9888d0fe732a7d6537666e2e844d0baeec906671c73e9b53f6663c784c4c9f`
 
 > [!TIP]
 > For more details, visit Anedya [documentation](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=pi).

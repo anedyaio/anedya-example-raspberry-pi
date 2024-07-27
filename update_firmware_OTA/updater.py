@@ -18,9 +18,9 @@ CONFIG_PATH = f'{script_directory}/configuration.json'
 #--------------------------------------Helper variables-----------------------------------------
 connection_key = ""
 depolyment_id = ""
-fetched_depolyment_data={}
+fetched_deployment_data={}
 
-
+#--------------------------------------Helper Functions-----------------------------------------
 def update_status(param_deployment_id: str, param_status: str, param_log=""):
     url = "https://device.ap-in-1.anedya.io/v1/ota/updateStatus"
 
@@ -36,7 +36,6 @@ def update_status(param_deployment_id: str, param_status: str, param_log=""):
         'Auth-mode': 'key',
         'Authorization': connection_key
     }
-
     response = requests.request("POST", url, headers=headers, data=payload, timeout=10)
     errorcode = json.loads(response.text).get('errorcode')
     if errorcode == 0:
@@ -45,7 +44,6 @@ def update_status(param_deployment_id: str, param_status: str, param_log=""):
     else:
         print(response.text)
         return False
-
 
 def submit_log(param_log:str)->bool:
 
@@ -77,7 +75,7 @@ def submit_log(param_log:str)->bool:
         print(response.text)
         return False
 
-def get_file(param_r_or_w:str,param_content=""):
+def r_or_w_config_file(param_r_or_w:str,param_content=""):
     param_path=CONFIG_PATH
     if param_r_or_w=="r":
         with open(param_path, param_r_or_w,encoding='utf-8') as file:
@@ -87,76 +85,6 @@ def get_file(param_r_or_w:str,param_content=""):
         with open(param_path, param_r_or_w,encoding='utf-8') as file:
             json.dump(param_content, file,indent=4)
             return True
-
-
-def fetch_update():
-    global depolyment_id, fetched_depolyment_data
-    try:
-        url = "https://device.ap-in-1.anedya.io/v1/ota/next"
-        payload = json.dumps({"reqId": ""})
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Auth-mode': 'key',
-            'Authorization': connection_key
-        }
-        response = requests.post(url, headers=headers, data=payload, timeout=10)
-        response_message = response.json()
-        fetched_depolyment_data=response_message.get('data', {})
-        depolyment_id = response_message.get('data', {}).get("deploymentId")
-        depolyment_version=response_message.get('data', {}).get("assetVersion")
-        if depolyment_id:
-            asset_url = response_message.get('data', {}).get("asseturl")
-            update_status(param_deployment_id=depolyment_id, param_status="start", param_log="success")
-            submit_log(f"Received new deployment request, [Version:{depolyment_version}]")
-            check_sum = response_message.get('data', {}).get("assetChecksum")
-            # print(check_sum)
-
-            if not asset_url:
-                print("No asset URL found in the update response.")
-                return False
-            else:
-                asset_response = requests.get(asset_url, timeout=10)
-                # print(asset_response.content.decode('utf-8'))
-                if asset_response.status_code == 200:
-                    update_status(param_deployment_id=depolyment_id, param_status="download", param_log="success")
-                    submit_log("Downloading update...")
-                    with open(TEMP_PATH, 'wb') as file:
-                        file.write(asset_response.content)
-                    if check_sum:
-                        print("verifying checksum...")
-                        file_hash_code=sha256_checksum(TEMP_PATH)
-                        print(file_hash_code[:36])
-                        if file_hash_code[:36] == check_sum:
-                            print("Checksum verified.")
-                            update_status(param_deployment_id=depolyment_id, param_status="extract", param_log="Checksum verified")
-                            submit_log("Extracting update...")
-                            return True
-                        else:
-                            print("Checksum verification failed.")
-                            update_status(param_deployment_id=depolyment_id, param_status="failed", param_log="Checksum verification failed")
-                            submit_log("Checksum verification failed.")
-                            print("continuing the script run...")
-                            return False
-                    else:
-                        return True
-                else:
-                    print(f'Failed to fetch update. Status code: {asset_response.status_code}')
-                    return False
-        else:
-            print("No Update available.")
-            return False
-    except requests.exceptions.RequestException as e:
-        print(f'Error fetching update: {e}')
-        return False
-    except json.JSONDecodeError as e:
-        print(f'Error decoding JSON response: {e}')
-        return False
-    except Exception as e:
-        print(f'Unexpected error: {e}')
-        return False
-
-#function to sha256 checksum
 def sha256_checksum(filename):
     sha256_hash = hashlib.sha256()
     with open(filename, "rb") as f:
@@ -164,6 +92,102 @@ def sha256_checksum(filename):
         for byte_block in iter(lambda: f.read(4096), b""):
             sha256_hash.update(byte_block)
         return sha256_hash.hexdigest()
+#----------------------------------------------------------------------------------------------
+def fetch_update():
+    global depolyment_id, fetched_deployment_data, connection_key
+    config_data=r_or_w_config_file(param_r_or_w="r")
+    if config_data["CONNECTION_KEY"]:
+        connection_key=config_data["CONNECTION_KEY"]
+        try:
+            url = "https://device.ap-in-1.anedya.io/v1/ota/next"
+            payload = json.dumps({"reqId": ""})
+            headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Auth-mode': 'key',
+                'Authorization': connection_key
+            }
+            response = requests.post(url, headers=headers, data=payload, timeout=10)
+            response_message = response.json()
+            fetched_deployment_data=response_message.get('data', {})
+            depolyment_id = fetched_deployment_data.get("deploymentId")
+            if depolyment_id:
+                return fetched_deployment_data
+            else:
+                print('No new deployment request')
+                return ""
+
+        except requests.exceptions.RequestException as e:
+            print(f'Error fetching update: {e}')
+            return False
+        except json.JSONDecodeError as e:
+            print(f'Error decoding JSON response: {e}')
+            return False
+        except Exception as e:
+            print(f'Unexpected error: {e}')
+            return False
+    else:
+        print('No connection key found!!')
+    
+def check_deploybility():
+        new_asset_version=fetched_deployment_data.get("assetVersion")
+        config_data=r_or_w_config_file("r")
+        active_version=config_data.get("ACTIVE_VERSION")
+        update_status(param_deployment_id=depolyment_id, param_status="start", param_log="Received new deployment request")
+        submit_log(f"Received new deployment request, [Version:{new_asset_version}]")
+        if active_version=="":
+            active_version='0'
+        if str(new_asset_version)>str(active_version):
+            asset_url = fetched_deployment_data.get("asseturl")
+            # print(asset_url)
+
+            check_sum = fetched_deployment_data.get('data', {}).get("assetChecksum")
+            # print(check_sum)
+
+            if not asset_url:
+                update_status(param_deployment_id=depolyment_id, param_status="failure", param_log="No asset URL found in the update response.")
+                submit_log("No asset URL found in the update response.")
+                return False
+            else:
+                i=0
+                while i<5:
+                    asset_response = requests.get(asset_url, timeout=10)
+                    # print(asset_response.content.decode('utf-8'))
+                    if asset_response.status_code == 200:
+                        update_status(param_deployment_id=depolyment_id, param_status="download", param_log="success")
+                        submit_log("Downloading update...")
+                        with open(TEMP_PATH, 'wb') as file:
+                            file.write(asset_response.content)
+                        if check_sum:
+                            print("verifying checksum...")
+                            file_hash_code=sha256_checksum(TEMP_PATH)
+                            print(file_hash_code[:36])
+                            if file_hash_code[:36] == check_sum:
+                                print("Checksum verified.")
+                                update_status(param_deployment_id=depolyment_id, param_status="extract", param_log="Checksum verified")
+                                submit_log("Extracting update...")
+                                return True
+                            else:
+                                update_status(param_deployment_id=depolyment_id, param_status="failure", param_log="Checksum verification failed")
+                                submit_log("Checksum verification failed. redownloading...")
+                                i+=1
+                        else:
+                            return True
+                    else:
+                        print(f'Failed to fetch update. Status code: {asset_response.status_code}')
+                        return False
+                if i==5:
+                    update_status(param_deployment_id=depolyment_id, param_status="failure", param_log="Failed to fetch update")
+                    submit_log("Failed download update!")
+                    return False
+        else:
+            update_status(param_deployment_id=depolyment_id, param_status="failure", param_log="check the asset version!")
+            submit_log("CAUTION: check the asset version!")
+            config_data = r_or_w_config_file(param_r_or_w='r')
+            config_data['LAST_DEPLOYMENT_STATUS']=f'failed [version: {new_asset_version}]'
+            config_data['LAST_CHANGED_LOG']=int(time.time()*1000)
+            r_or_w_config_file(param_r_or_w='w',param_content=config_data)
+            return False
 
 def apply_update():
     try:
@@ -175,80 +199,63 @@ def apply_update():
                 # Write the content to the destination file
                 dest.write(content)
             os.replace(TEMP_PATH, current_script_path)
-            config_data=get_file(param_r_or_w="r")
+            config_data=r_or_w_config_file(param_r_or_w="r")
             config_data["CONNECTION_KEY"]=connection_key
             if config_data['ACTIVE_DEPLOYMENT']!="":
                 config_data["PREVIOUS_DEPLOYMENT"]=config_data['ACTIVE_DEPLOYMENT']
-            config_data["ACTIVE_DEPLOYMENT"]=fetched_depolyment_data
-            config_data['ACTIVE_VERSION']=fetched_depolyment_data['assetVersion']
-            get_file(param_r_or_w="w",param_content=config_data)
-            return True
+            config_data["ACTIVE_DEPLOYMENT"]=fetched_deployment_data
+            config_data['ACTIVE_VERSION']=str(fetched_deployment_data['assetVersion'])
+            r_or_w_config_file(param_r_or_w="w",param_content=config_data)
+            
+            try:
+                # Check if the script runs successfully
+                try:
+                    update_status(param_deployment_id=depolyment_id, param_status="installing", param_log="installing")
+                    submit_log("Deploying update...")
+                    config_data = r_or_w_config_file(param_r_or_w='r')
+                    config_data['LAST_DEPLOYMENT_STATUS']='success'
+                    config_data['LAST_CHANGED_LOG']=int(time.time()*1000)
+                    r_or_w_config_file(param_r_or_w='w',param_content=config_data)            
+
+                    subprocess.check_call([sys.executable, current_script_path])
+
+
+                except subprocess.CalledProcessError as e:
+                    print(f'Script run failed with error code {e.returncode}')
+                    update_status(param_deployment_id=depolyment_id, param_status="failure", param_log=f'Script run failed with error code {e.returncode}')
+                    submit_log('Script run failed!! restarting previous script')
+                    
+                    #-------------------------update config file----------------------------------------------
+                    config_data = r_or_w_config_file(param_r_or_w='r')
+                    previous_deployment=config_data.get('PREVIOUS_DEPLOYMENT')
+                    if previous_deployment!="":
+                        config_data["ACTIVE_DEPLOYMENT"]=previous_deployment
+                        config_data["ACTIVE_VERSION"]=str(config_data.get('PREVIOUS_DEPLOYMENT').get('assetVersion'))
+                    config_data['LAST_DEPLOYMENT_STATUS']='failed'
+                    config_data['LAST_CHANGED_LOG']=int(time.time()*1000)
+                    r_or_w_config_file(param_r_or_w='w',param_content=config_data)
+                    #------------------------------------------------------------------------------------------
+
+                    with open(previous_script_path, 'r',encoding='utf-8') as src, open(current_script_path, 'w', encoding='utf-8') as dest:
+                        # Read the content of the source file
+                        content = src.read()
+                        # Write the content to the destination file
+                        dest.write(content)
+                    subprocess.Popen([sys.executable, previous_script_path])
+                    # return False
+    
+                # Terminate the current script
+                if os.name == 'posix':  # Check if the operating system is POSIX (e.g., Linux)
+                    os.kill(os.getpid(), signal.SIGTERM)
+                elif os.name == 'nt':  # Check if the operating system is Windows
+                    os._exit(0)  # Exit the script on Windows
+            except Exception as e:
+                print(f'Error restarting script: {e}')
+            
         else:
             print('Update file does not exist.')
             return False
     except Exception as e:
         print(f'Error applying update: {e}')
         return False
-
-def restart_script():
-    try:
-        # Check if the script runs successfully
-        try:
-            update_status(param_deployment_id=depolyment_id, param_status="installing", param_log="installing")
-            submit_log("Deploying update...")
-            config_data = get_file(param_r_or_w='r')
-            config_data['LAST_DEPLOYMENT_STATUS']='success'
-            config_data['LAST_CHANGED_LOG']=int(time.time()*1000)
-            get_file(param_r_or_w='w',param_content=config_data)            
-
-            subprocess.check_call([sys.executable, current_script_path])
-
-
-        except subprocess.CalledProcessError as e:
-            print(f'Script run failed with error code {e.returncode}')
-            update_status(param_deployment_id=depolyment_id, param_status="failed", param_log=f'Script run failed with error code {e.returncode}')
-            submit_log('Script run failed!! restarting previous script')
-            
-            #-------------------------update config file----------------------------------------------
-            config_data = get_file(param_r_or_w='r')
-            previous_deployment=config_data.get('PREVIOUS_DEPLOYMENT')
-            if previous_deployment!="":
-                config_data["ACTIVE_DEPLOYMENT"]=previous_deployment
-                config_data["ACTIVE_VERSION"]=config_data.get('PREVIOUS_DEPLOYMENT').get('assetVersion')
-            config_data['LAST_DEPLOYMENT_STATUS']='failed'
-            config_data['LAST_CHANGED_LOG']=int(time.time()*1000)
-            get_file(param_r_or_w='w',param_content=config_data)
-            #------------------------------------------------------------------------------------------
-
-            with open(previous_script_path, 'r',encoding='utf-8') as src, open(current_script_path, 'w', encoding='utf-8') as dest:
-                # Read the content of the source file
-                content = src.read()
-                # Write the content to the destination file
-                dest.write(content)
-            subprocess.Popen([sys.executable, previous_script_path])
-            # return False
    
-
-        # Terminate the current script
-        if os.name == 'posix':  # Check if the operating system is POSIX (e.g., Linux)
-            os.kill(os.getpid(), signal.SIGTERM)
-        elif os.name == 'nt':  # Check if the operating system is Windows
-            os._exit(0)  # Exit the script on Windows
-    except Exception as e:
-        print(f'Error restarting script: {e}')
-
-def check_for_updates(param_connection_key:str):
-    global connection_key
-    connection_key=param_connection_key
-    if fetch_update():
-        # print('Applying update...')
-        if apply_update():
-            # print('Update applied successfully. Restarting the script...')
-            try:
-                restart_script()
-            except Exception as e:
-                print(f'Error restarting script: {e}')
-        else:
-            print('No update needed.')
-    else:
-        print('continuing the script run...')

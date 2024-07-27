@@ -3,17 +3,17 @@ import json
 import requests
 from pathlib import Path
 
-from updater import check_for_updates
+from updater import fetch_update
+from updater import check_deploybility
+from updater import apply_update
 
-
-#-----------credentials-----------------------------
-CONNECTION_KEY = ""
 
 #----------settings---------------------------------
 CHECK_FOR_OTA_UPDATE_SEC=5
 
 #-----------Helpers variables-----------------------
 runned_once = False
+CONNECTION_KEY = ""
 
 #--------------Path variables-----------------------
 # Get the directory of the current script
@@ -21,19 +21,42 @@ script_directory = Path(__file__).parent
 CONFIG_PATH = f'{script_directory}/configuration.json'
 
 def main():
-    global runned_once
+    global runned_once, CONNECTION_KEY
     update_interval=int(time.time())
+    config_data = r_or_w_config_file(param_r_or_w='r')
+    CONNECTION_KEY = config_data["CONNECTION_KEY"]
 
     while True:
         #----------------------------------------OTA section---------------------------------------------------------------
         if int(time.time()) - update_interval > CHECK_FOR_OTA_UPDATE_SEC:
             print("----------------------------------------------")
             print("checking for updates...")
-            check_for_updates(param_connection_key=CONNECTION_KEY)
+            new_deployment = fetch_update()  #check for updates and return True if there is a new deployment
+            if new_deployment: #if there is a new deployment
+                print(f"new deployment: {new_deployment.get('assetName')}")
+                print(f"new deployment assetID: {new_deployment.get('assetId')}")
+                print(f"new deployment version: {new_deployment.get('assetVersion')}")
+                print(f"new deployment deploymentId: {new_deployment.get('deploymentId')}")
+                print(f"new deployment checksum: {new_deployment.get('checksum')}")
+                print(f"new deployment assetMeta : {new_deployment.get('assetMeta')}")
+                print(f"new deployment assetUrl : {new_deployment.get('assetUrl')}")
+
+                print("checking deploybility of the received asset - check its version, checksum..")
+                if check_deploybility(): #check deploybility of the received asset - check its version, checksum..
+                    print("deploybility check passed!")
+
+                    print("applying the update : if the version is not the same and checksum is correct, apply the update")
+                    apply_update()  #apply the update : if the version is not the same and checksum is correct, apply the update
+
+                else:
+                    submit_log("deploybility check failed!..continuing the script run...")
+            else:
+                print('continuing the script run...')
+
             update_interval=int(time.time())
             print("----------------------------------------------")
         if not runned_once:
-            config_data = get_file(param_r_or_w='r')
+            config_data = r_or_w_config_file(param_r_or_w='r')
             try:
                 deployed_id = config_data["ACTIVE_DEPLOYMENT"]["deploymentId"]
                 deployed_version=config_data["ACTIVE_DEPLOYMENT"]["assetVersion"]
@@ -51,7 +74,9 @@ def main():
 
 
         print()
-        print("[Version 0.0.1] Runnning...")
+        config_data = r_or_w_config_file(param_r_or_w='r')
+        asset_version = config_data["ACTIVE_VERSION"]
+        print(f"[Version {asset_version}] Runnning...")
         print()
         time.sleep(2)
 
@@ -120,7 +145,8 @@ def submit_log(param_log: str) -> bool:
     else:
         print(f"Error in response: {response_data}")
         return False
-def get_file(param_r_or_w:str,param_content=""):
+    
+def r_or_w_config_file(param_r_or_w:str,param_content=""):
     param_path=CONFIG_PATH
     if param_r_or_w=="r":
         with open(param_path, param_r_or_w,encoding='utf-8') as file:

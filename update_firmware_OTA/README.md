@@ -19,10 +19,17 @@ This Python script allows you to update the firmware via OTA. It fetches the fir
 3. Fill in the following details precisely:
     - **Asset Identifier**
     - **Asset Version**
-    - **Checksum**: Use the following command to obtain the checksum. Open the command prompt, navigate to the file directory, and run:
-      ```
-      certutil -hashfile [file location] SHA256
-      ```
+    - **Checksum**: Use the following command to obtain the checksum.
+        For Windows:
+            Open the command prompt, navigate to the file directory, and run:
+            ```
+            certutil -hashfile [file ] SHA256
+            ```
+        For Linux:
+            Open the terminal, navigate to the file directory, and run:
+            ```
+            sha256sum [file ]
+            ```
 4. Next, go to Deployments -> Create Deployment. Fill in the details:
     - **Deployment Name**
     - **Set Start Time**

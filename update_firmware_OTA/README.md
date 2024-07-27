@@ -39,28 +39,28 @@ All set on the dashboard side.
 
 ### Raspberry Pi Project Setup Guide
 
-Follow these instructions to set up and run your project on a Raspberry Pi.
+    Follow these instructions to set up and run your project on a Raspberry Pi.
 
 #### Steps:
 
 1. Copy the Example Code
 
-Start by copying the example code provided. This code will serve as the foundation of your project.
+    Start by copying the example code provided. This code will serve as the foundation of your project.
 
 2. Configure Your Project
 
-Open the `configuration.json` file and fill in the following details:
-- **Project Name**: Enter your project's name.
-- **Connection Key**: Provide the connection key for your project.
-- **Asset Version**: Specify the asset version you are working with.
+    Open the `configuration.json` file and fill in the following details:
+    - **Project Name**: Enter your project's name.
+    - **Connection Key**: Provide the connection key for your project.
+    - **Asset Version**: Specify the asset version you are working with.
 
-Example `configuration.json`:
-```json
-{
-  "project_name": "Your_Project_Name",
-  "connection_key": "Your_Connection_Key",
-  "asset_version": "Your_Asset_Version"
-}
+    Example `configuration.json`:
+    ```json
+        {
+        "project_name": "Your_Project_Name",
+        "connection_key": "Your_Connection_Key",
+        "asset_version": "Your_Asset_Version"
+        }
 
 > [!TIP]
 > For more details, visit Anedya [documentation](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=pi).

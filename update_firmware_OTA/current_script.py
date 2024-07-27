@@ -8,12 +8,14 @@ from updater import check_deploybility
 from updater import apply_update
 
 
+#-----------credentials-----------------------------
+CONNECTION_KEY = ""
+
 #----------settings---------------------------------
 CHECK_FOR_OTA_UPDATE_SEC=5
 
 #-----------Helpers variables-----------------------
 runned_once = False
-CONNECTION_KEY = ""
 
 #--------------Path variables-----------------------
 # Get the directory of the current script
@@ -39,7 +41,7 @@ def main():
                 print(f"new deployment deploymentId: {new_deployment.get('deploymentId')}")
                 print(f"new deployment checksum: {new_deployment.get('checksum')}")
                 print(f"new deployment assetMeta : {new_deployment.get('assetMeta')}")
-                print(f"new deployment assetUrl : {new_deployment.get('assetUrl')}")
+                print(f"new deployment assetUrl : {new_deployment.get('asseturl')}")
 
                 print("checking deploybility of the received asset - check its version, checksum..")
                 if check_deploybility(): #check deploybility of the received asset - check its version, checksum..

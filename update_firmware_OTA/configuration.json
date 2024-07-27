@@ -1,7 +1,7 @@
 {
     "PROJECT_NAME": "update_firmware_OTA",
     "CONNECTION_KEY": "",
-    "ACTIVE_VERSION": "",
+    "ACTIVE_VERSION": "0.0.a",
     "ACTIVE_DEPLOYMENT": {},
     "PREVIOUS_DEPLOYMENT": {},
     "LAST_DEPLOYMENT_STATUS": "",

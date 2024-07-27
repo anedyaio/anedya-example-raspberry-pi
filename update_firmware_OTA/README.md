@@ -9,8 +9,12 @@ This Python script allows you to update the firmware via OTA. It fetches the fir
 
 ## Steps for Deployment:
 ### Anedya Dashboard
-
 1. Go to OTA Deployments -> Assets List and click on "Upload".
+> [!NOTE]
+> Sample assets are included in the folder. You can use the sample script to test the OTA through Anedya.
+> Checksums:
+> **asset_for_test_with_checksum.py**: `0f9888d0fe732a7d6537666e2e844d0baeec906671c73e9b53f6663c784c4c9f`
+
 2. Upload your script.
 3. Fill in the following details precisely:
     - **Asset Identifier**
@@ -32,13 +36,6 @@ All set on the dashboard side.
 3. Write down your code in the `current_script.py` file.
 4. Install the necessary dependencies and it's ready to go.
 5. Run the `current_script.py`.
-
-## For Testing
-
-Sample assets are included in the folder. You can use the sample script to test the OTA through Anedya.
-
-Checksums:
-- **asset_for_test_with_checksum.py**: `0f9888d0fe732a7d6537666e2e844d0baeec906671c73e9b53f6663c784c4c9f`
 
 > [!TIP]
 > For more details, visit Anedya [documentation](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=pi).

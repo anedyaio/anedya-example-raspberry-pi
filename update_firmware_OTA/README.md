@@ -38,7 +38,7 @@ All set on the dashboard side.
 Sample assets are included in the folder. You can use the sample script to test the OTA through Anedya.
 
 Checksums:
-- **v0.2.py**: `0f9888d0fe732a7d6537666e2e844d0baeec906671c73e9b53f6663c784c4c9f`
+- **asset_for_test_with_checksum.py**: `0f9888d0fe732a7d6537666e2e844d0baeec906671c73e9b53f6663c784c4c9f`
 
 > [!TIP]
 > For more details, visit Anedya [documentation](https://docs.anedya.io?utm_source=github&utm_medium=link&utm_campaign=github-examples&utm_content=pi).

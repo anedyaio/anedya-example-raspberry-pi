@@ -110,6 +110,9 @@ def fetch_update():
             response = requests.post(url, headers=headers, data=payload, timeout=10)
             response_message = response.json()
             fetched_deployment_data=response_message.get('data', {})
+            if fetched_deployment_data is None:
+                print('No new deployment request')
+                return ""
             depolyment_id = fetched_deployment_data.get("deploymentId")
             if depolyment_id:
                 return fetched_deployment_data
